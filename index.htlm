@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VMV MotoGP Setup</title>
+    
+    <!-- Manifeste PWA intégré en base64 -->
+    <link rel="manifest" href='data:application/manifest+json;charset=utf-8,{"name":"VMV MotoGP Setup","short_name":"VMV Setup","start_url":"./index.html","display":"standalone","background_color":"%230a0a0a","theme_color":"%23ff3333","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/3790/3790155.png","sizes":"512x512","type":"image/png"}]}'>
+    
+    <meta name="theme-color" content="#ff3333">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="header-container">
+        <div>
+            <h2>VMV MOTOGP SETUP</h2>
+            <div class="sub-header">PWA - Boîte de Vitesse & Supabase</div>
+        </div>
+        <button id="btnConnect" class="btn-connect">Se connecter</button>
+    </div>
+
+    <div class="nav-tabs">
+        <button class="nav-tab active" id="btn-setups">Setups</button>
+        <button class="nav-tab" id="btn-creer">+ Partager</button>
+        <button class="nav-tab" id="btn-coach">🏍️ Coach IA</button>
+        <button class="nav-tab" id="btn-profil">👤 Profil</button>
+    </div>
+
+    <!-- 1. SETUPS -->
+    <div id="tab-setups" class="tab-content active">
+        <div class="card">
+            <h3>🌐 Set-ups Communautaires</h3>
+            <p style="font-size: 11px; color: #888; margin-top:0;">Clique sur un setup pour afficher tous ses réglages détaillés.</p>
+            <label>Filtrer par moto ou auteur :</label>
+            <input type="text" id="filtreInput" placeholder="Ex: Ducati, Rossi...">
+            <label>Circuit :</label>
+            <select id="filtreCircuitSelect">
+                <option value="">Tous les circuits (22)</option>
+                <option value="Losail">Losail (Qatar)</option>
+                <option value="Mandalika">Mandalika (Indonésie)</option>
+                <option value="Termas de Río Hondo">Termas de Río Hondo (Argentine)</option>
+                <option value="COTA">COTA / Austin (Amériques)</option>
+                <option value="Portimão">Portimão (Portugal)</option>
+                <option value="Jerez">Jerez (Espagne)</option>
+                <option value="Le Mans">Le Mans (France)</option>
+                <option value="Mugello">Mugello (Italie)</option>
+                <option value="Catalogne">Catalogne (Espagne)</option>
+                <option value="Sachsenring">Sachsenring (Allemagne)</option>
+                <option value="Assen">Assen (Pays-Bas)</option>
+                <option value="KymiRing">KymiRing (Finlande)</option>
+                <option value="Silverstone">Silverstone (Grande-Bretagne)</option>
+                <option value="Red Bull Ring">Red Bull Ring (Autriche)</option>
+                <option value="Aragon">Aragon (Espagne)</option>
+                <option value="Misano">Misano (Saint-Marin)</option>
+                <option value="Motegi">Motegi (Japon)</option>
+                <option value="Buriram">Buriram / Thaïlande</option>
+                <option value="Phillip Island">Phillip Island (Australie)</option>
+                <option value="Sepang">Sepang (Malaisie)</option>
+                <option value="Valence">Valence (Espagne)</option>
+                <option value="Laguna Seca">Laguna Seca (USA)</option>
+            </select>
+            <div id="listeSetups" style="margin-top: 10px;">Chargement des setups communautaires...</div>
+        </div>
+    </div>
+
+    <!-- MODALE DE DETAIL SETUP -->
+    <div id="modalDetails">
+        <div class="modal-content">
+            <h3 id="modalTitre" style="color: #ff3333; margin-top:0;">Détails du Setup</h3>
+            <div id="modalCorps" style="font-size: 12px; line-height: 1.5; color: #ddd;"></div>
+            <button class="close-modal" id="btnCloseModal">Fermer</button>
+        </div>
+    </div>
+
+    <!-- 2. PARTAGER -->
+    <div id="tab-creer" class="tab-content">
+        <div class="card">
+            <h3>➕ Partager un Set-up Intégral</h3>
+            <form id="formSetup">
+                <label>Votre Pseudo :</label>
+                <input type="text" id="auteurInput" placeholder="Ex: Rossi46" required>
+                <div class="row">
+                    <div class="col"><label>Moto :</label><input type="text" id="motoInput" placeholder="Ex: Ducati" required></div>
+                    <div class="col"><label>Circuit :</label>
+                        <select id="circuitNomInput" required>
+                            <option value="Losail">Losail (Qatar)</option>
+                            <option value="Mandalika">Mandalika (Indonésie)</option>
+                            <option value="Termas de Río Hondo">Termas de Río Hondo (Argentine)</option>
+                            <option value="COTA">COTA / Austin (Amériques)</option>
+                            <option value="Portimão">Portimão (Portugal)</option>
+                            <option value="Jerez">Jerez (Espagne)</option>
+                            <option value="Le Mans">Le Mans (France)</option>
+                            <option value="Mugello">Mugello (Italie)</option>
+                            <option value="Catalogne">Catalogne (Espagne)</option>
+                            <option value="Sachsenring">Sachsenring (Allemagne)</option>
+                            <option value="Assen">Assen (Pays-Bas)</option>
+                            <option value="KymiRing">KymiRing (Finlande)</option>
+                            <option value="Silverstone">Silverstone (Grande-Bretagne)</option>
+                            <option value="Red Bull Ring">Red Bull Ring (Autriche)</option>
+                            <option value="Aragon">Aragon (Espagne)</option>
+                            <option value="Misano">Misano (Saint-Marin)</option>
+                            <option value="Motegi">Motegi (Japon)</option>
+                            <option value="Buriram">Buriram / Thaïlande</option>
+                            <option value="Phillip Island">Phillip Island (Australie)</option>
+                            <option value="Sepang">Sepang (Malaisie)</option>
+                            <option value="Valence">Valence (Espagne)</option>
+                            <option value="Laguna Seca">Laguna Seca (USA)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section-title">Pneumatiques</div>
+                <div class="row">
+                    <div class="col"><label>Avant</label><select id="pneuAvant"><option value="Soft">Soft</option><option value="Medium" selected>Medium</option><option value="Hard">Hard</option></select></div>
+                    <div class="col"><label>Arrière</label><select id="pneuArriere"><option value="Soft">Soft</option><option value="Medium" selected>Medium</option><option value="Hard">Hard</option></select></div>
+                </div>
+
+                <div class="section-title">Suspension Avant</div>
+                <div class="row">
+                    <div class="col"><label>Précharge</label><input type="number" id="suspAvPre" value="4" min="1" max="7"></div>
+                    <div class="col"><label>Huile</label><input type="number" id="suspAvHui" value="4" min="1" max="7"></div>
+                    <div class="col"><label>Ressort</label><input type="number" id="suspAvRes" value="4" min="1" max="7"></div>
+                </div>
+                <div class="row">
+                    <div class="col"><label>Compression</label><input type="number" id="suspAvCom" value="4" min="1" max="7"></div>
+                    <div class="col"><label>Extension</label><input type="number" id="suspAvExt" value="4" min="1" max="7"></div>
+                </div>
+
+                <div class="section-title">Suspension Arrière</div>
+                <div class="row">
+                    <div class="col"><label>Précharge</label><input type="number" id="suspArPre" value="4" min="1" max="7"></div>
+                    <div class="col"><label>Ressort</label><input type="number" id="suspArRes" value="4" min="1" max="7"></div>
+                    <div class="col"><label>Comp. Lente</label><input type="number" id="suspArCL" value="4" min="1" max="7"></div>
+                </div>
+                <div class="row">
+                    <div class="col"><label>Comp. Rapide</label><input type="number" id="suspArCR" value="4" min="1" max="7"></div>
+                    <div class="col"><label>Extension</label><input type="number" id="suspArExt" value="4" min="1" max="7"></div>
+                </div>
+
+                <div class="section-title">Boîte de Vitesse & Transmission</div>
+                <div class="row">
+                    <div class="col"><label>1ère</label><input type="number" id="bv1" value="4" min="1" max="7"></div>
+                    <div class="col"><label>2ème</label><input type="number" id="bv2" value="4" min="1" max="7"></div>
+                    <div class="col"><label>3ème</label><input type="number" id="bv3" value="4" min="1" max="7"></div>
+                </div>
+                <div class="row">
+                    <div class="col"><label>4ème</label><input type="number" id="bv4" value="4" min="1" max="7"></div>
+                    <div class="col"><label>5ème</label><input type="number" id="bv5" value="4" min="1" max="7"></div>
+                    <div class="col"><label>6ème</label><input type="number" id="bv6" value="4" min="1" max="7"></div>
+                </div>
+                <div class="row">
+                    <div class="col"><label>Rapport Final</label><input type="number" id="bvFinal" value="4" min="1" max="7"></div>
+                    <div class="col"><label>Anti-dribble embrayage</label><select id="antiDribble"><option value="Standard">Standard</option><option value="Doux">Doux</option><option value="Ferme">Ferme</option><option value="Désactivé">Désactivé</option></select></div>
+                </div>
+
+                <div class="section-title">Freins</div>
+                <div class="row">
+                    <div class="col"><label>Frein Avant</label><select id="freinAvant"><option value="340mm Standard">340mm Standard</option><option value="340mm High Mass">340mm High Mass</option><option value="355mm">355mm</option></select></div>
+                    <div class="col"><label>Frein Arrière</label><select id="freinArriere"><option value="220mm Standard">220mm Standard</option><option value="Carbone">Carbone</option></select></div>
+                </div>
+
+                <div class="section-title">Électronique / ECU</div>
+                <div class="row">
+                    <div class="col"><label>TCS (Traction)</label><input type="number" id="ecuTcs" value="3" min="1" max="5"></div>
+                    <div class="col"><label>Anti-Wheelie</label><input type="number" id="ecuAw" value="3" min="1" max="5"></div>
+                    <div class="col"><label>Frein Moteur (EBS)</label><input type="number" id="ecuEbs" value="3" min="1" max="5"></div>
+                </div>
+
+                <div class="section-title">Géométrie</div>
+                <div class="row">
+                    <div class="col"><label>Angle Chasse</label><input type="number" id="geoCha" value="4" min="1" max="7"></div>
+                    <div class="col"><label>Déport</label><input type="number" id="geoDep" value="4" min="1" max="7"></div>
+                    <div class="col"><label>Plaque Col.</label><input type="number" id="geoPla" value="4" min="1" max="7"></div>
+                    <div class="col"><label>Bras oscillant</label><input type="number" id="geoBra" value="4" min="1" max="7"></div>
+                </div>
+
+                <button type="submit" class="action-btn">Publier le Setup sur le Cloud</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. COACH IA -->
+    <div id="tab-coach" class="tab-content">
+        <div class="card">
+            <h3>👑 Coach IA Extrême (Ingénieur Piste Radical)</h3>
+            <div class="sub-nav-coach">
+                <button class="sub-coach-btn active" id="btnCoachRapide">⚡ Coach Rapide</button>
+                <button class="sub-coach-btn" id="btnCoachComplet">🚀 Générateur Extrême</button>
+            </div>
+            <div id="viewCoachRapide" class="coach-sub-view active">
+                <label>Phase de pilotage :</label>
+                <select id="phaseSelect">
+                    <option value="Entree">Entrée de virage (Freinage / Inscription)</option>
+                    <option value="Milieu">Milieu de virage (Sur l'angle / Trajectoire)</option>
+                    <option value="Sortie">Sortie de virage (Accélération / Relance)</option>
+                </select>
+                <label>Problème rencontré :</label>
+                <select id="problemeSelect"></select>
+                <div id="conseilBox" class="ai-box">Sélectionne un problème...</div>
+            </div>
+            <div id="viewCoachComplet" class="coach-sub-view">
+                <label>Choisis ton Circuit :</label>
+                <select id="aiCircuitNom">
+                    <option value="Losail">Losail (Qatar)</option>
+                    <option value="Mandalika">Mandalika (Indonésie)</option>
+                    <option value="Termas de Río Hondo">Termas de Río Hondo (Argentine)</option>
+                    <option value="COTA">COTA / Austin (Amériques)</option>
+                    <option value="Portimão">Portimão (Portugal)</option>
+                    <option value="Jerez">Jerez (Espagne)</option>
+                    <option value="Le Mans">Le Mans (France)</option>
+                    <option value="Mugello">Mugello (Italie)</option>
+                    <option value="Catalogne">Catalogne (Espagne)</option>
+                    <option value="Sachsenring">Sachsenring (Allemagne)</option>
+                    <option value="Assen">Assen (Pays-Bas)</option>
+                    <option value="KymiRing">KymiRing (Finlande)</option>
+                    <option value="Silverstone">Silverstone (Grande-Bretagne)</option>
+                    <option value="Red Bull Ring">Red Bull Ring (Autriche)</option>
+                    <option value="Aragon">Aragon (Espagne)</option>
+                    <option value="Misano">Misano (Saint-Marin)</option>
+                    <option value="Motegi">Motegi (Japon)</option>
+                    <option value="Buriram">Buriram / Thaïlande</option>
+                    <option value="Phillip Island">Phillip Island (Australie)</option>
+                    <option value="Sepang">Sepang (Malaisie)</option>
+                    <option value="Valence">Valence (Espagne)</option>
+                    <option value="Laguna Seca">Laguna Seca (USA)</option>
+                </select>
+                <label>Conditions Météo :</label>
+                <select id="aiMeteo">
+                    <option value="Sec / Chaud">Sec / Piste chaude</option>
+                    <option value="Sec / Frais">Sec / Piste fraîche</option>
+                    <option value="Humide / Pluie">Humide / Pluie</option>
+                </select>
+                <label>Problèmes multiples :</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="probMulti" value="stabilite"> Gros manque de stabilité au freinage</label>
+                    <label><input type="checkbox" name="probMulti" value="pivoter"> Impossibilité de faire pivoter la moto</label>
+                    <label><input type="checkbox" name="probMulti" value="patinage"> Patinage massif à la réaccélération</label>
+                    <label><input type="checkbox" name="probMulti" value="elargit"> Élargissement systématique en sortie</label>
+                    <label><input type="checkbox" name="probMulti" value="pompage"> Pompage violent de l'arrière (Squat)</label>
+                    <label><input type="checkbox" name="probMulti" value="blocage_arriere"> Blocage ou dribble roue arrière</label>
+                </div>
+                <button type="button" class="action-btn" id="btnGenererSetupAI">Générer le Setup Extrême</button>
+                <div id="setupCompletBox" class="ai-box" style="display:none; margin-top: 15px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. PROFIL -->
+    <div id="tab-profil" class="tab-content">
+        <div class="card" style="text-align: center;">
+            <h3>👤 Profil Pilote (Local)</h3>
+            <label>Votre Pseudo :</label>
+            <input type="text" id="pseudoActifInput" placeholder="Entrez votre pseudo">
+            <button type="button" class="action-btn" id="btnToggleProfil" style="background:#ff3333;">Se connecter</button>
+            <p id="statutSession" style="color: #888; font-size: 11px; margin-top: 8px;">Statut : Déconnecté</p>
+        </div>
+    </div>
+
+    <!-- Script principal et Service Worker intégré -->
+    <script src="app.js"></script>
+    <script>
+        // Enregistrement dynamique d'un Service Worker en Blob pour tout garder en 1 seul fichier
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                self.addEventListener('install', e => self.skipWaiting());
+                self.addEventListener('activate', e => e.waitUntil(clients.claim()));
+                self.addEventListener('fetch', e => {
+                    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+                });
+            `;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register(swUrl)
+                    .then(reg => console.log('PWA prête (Fichier Unique)'))
+                    .catch(err => console.log('Erreur PWA', err));
+            });
+        }
+    </script>
+</body>
+</html>
